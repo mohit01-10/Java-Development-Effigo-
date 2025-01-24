@@ -1,0 +1,4 @@
+insert into course(id , namee, author)
+values(1, 'Abc', 'me');
+
+select * from course
