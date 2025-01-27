@@ -1,12 +1,23 @@
 package com.my.webapps.jpa_and_hibernate_postgres.course;
 
-import java.math.BigInteger;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "subject", schema = "courses")
 public class Subject {
-
+	
+	@Id
 	private long id;
+	
+	@Column(name = "name")
 	private String name;
+	
+	@Column(name = "author")
 	private String author;
+	
 	
 	public Subject() {
 		
