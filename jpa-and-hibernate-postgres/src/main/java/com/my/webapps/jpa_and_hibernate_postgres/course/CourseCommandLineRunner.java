@@ -22,15 +22,15 @@ public class CourseCommandLineRunner implements CommandLineRunner{
 	
 	@Override
 	public void run(String... args) throws Exception{
-		repository.save(new Subject(1,"springjpa","me"));
-		repository.save(new Subject(2,"jpa","me"));
+		repository.save(new Subject(9,"springjpa","me"));
+		repository.save(new Subject(10,"jpa","me"));
 		
-		repository.deleteById(3l);
+		repository.deleteById(4l);
 		
 		System.out.println(repository.findById(5l));
 		System.out.println(repository.findById(6l));
 		
-		System.out.println(repository.findByAuthor("me"));
+	//	System.out.println(repository.findByAuthor("me"));
 		
 		
 	}

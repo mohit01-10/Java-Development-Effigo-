@@ -14,7 +14,7 @@ public class LoginController {
 	private AuthenticationService authenticationService;
 	
 	//GET, POST 
-	@RequestMapping(value = "login", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String gotoLoginPage() {
 	//	model.put("name", name);
 		return "login";
