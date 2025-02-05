@@ -1,6 +1,9 @@
 package com.assignment.loginpage.util;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Component;
@@ -17,6 +20,9 @@ public class JwtUtil {
     private final byte[] secretKeyBytes = SECRET_KEY.getBytes(); // Convert key to bytes for better security
     private final SecretKey signingKey = Keys.hmacShaKeyFor(secretKeyBytes); // Secure key for HMAC-SHA256
 
+    
+    private final Set<String> tokenBlacklist = new HashSet<>();
+    
     // Method for generating token
     public String generateToken(String username) {
         return Jwts.builder()
@@ -37,10 +43,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Validate the token
-    public boolean validateToken(String token, String username) {
-        return (username.equals(extractUsername(token)) && !isTokenExpired(token));
-    }
 
     // Check if token is expired
     private boolean isTokenExpired(String token) {
@@ -52,4 +54,20 @@ public class JwtUtil {
                 .getExpiration()
                 .before(new Date(System.currentTimeMillis()));
     }
+    
+    
+    public void invalidateToken(String token) {
+        tokenBlacklist.add(token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return tokenBlacklist.contains(token);
+    }
+    
+    // Validate the token
+    public boolean validateToken(String token, String username) {
+        return (username.equals(extractUsername(token)) && !isTokenExpired(token) && !isTokenBlacklisted(token));
+    }
+
+    
 }
