@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+
+   <div class="centerdiv" id="centerdiv">
+      <div id="auth-container">
+         <h2>Login to Account</h2>
+
+         <input class="iptext" type="text" id="name" placeholder="Name">
+         <div class="hr1"></div>
+         <div class="input-with-icon">
+             <input class="iptext" type="password" id="password" placeholder="Password">
+             <i class="toggle-icon fas fa-eye fa-lg" onclick="togglePasswordVisibility(this)"></i>
+         </div>
+         <div class="hr1"></div>
+
+         <div class="btncont">
+             <button class="loginbutton" onclick="login()"><b>Login</b></button>
+             <button class="loginbutton" onclick="register()"><b>Register</b></button>
+         </div>
+      </div>
+   </div>
+
+   <div id="chat-container" style="display: none;">
+       <h1>Welcome to dashboard</h1>
+
+       <div class ="btncont">
+        <button class="loginbutton" >Settings</button>
+        <button class="loginbutton" onclick="logout()">Logout</button>
+     </div>
+   </div>
+
+   <script src="auth.js"></script>
+
+   <script>
+       function togglePasswordVisibility(icon) {
+           var passwordInput = document.getElementById("password");
+           if (passwordInput.type === "password") {
+               passwordInput.type = "text";
+               icon.classList.remove("fa-eye");
+               icon.classList.add("fa-eye-slash");
+           } else {
+               passwordInput.type = "password";
+               icon.classList.remove("fa-eye-slash");
+               icon.classList.add("fa-eye");
+           }
+       }
+   </script>
+
+</body>
+</html>
