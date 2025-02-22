@@ -54,22 +54,28 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
         
-    const storedUser = localStorage.getItem("user");
+    // const storedUser = localStorage.getItem("user");
       
-        if (storedUser) {
-          try {
-            const user = JSON.parse(storedUser);
-            setUser(user)
-          } catch (error) {
-            console.error("Error parsing user data from localStorage", error);
-            navigate("/login");
-          }
-        }
+    //     if (storedUser) {
+    //       try {
+    //         const user = JSON.parse(storedUser);
+    //         setUser(user)
+    //       } catch (error) {
+    //         console.error("Error parsing user data from localStorage", error);
+    //         navigate("/login");
+    //       }
+    //     }
 
-    else{
+    // else{
       try {
         const response = await api.get("/api/current-user", { withCredentials: true });
         setUser(response.data);
+        if(response.data?.status === "INACTIVE")
+        {
+            alert("User in INACTIVE! You have been Logged out. Login again")
+            localStorage.removeItem("user");
+            navigate("/login");
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
         if (error.response?.status === 403 || error.response?.status === 401) {
@@ -77,7 +83,7 @@ const Profile = () => {
           navigate("/login");
         }
       }
-    }
+    
 };
 
     fetchProfile();

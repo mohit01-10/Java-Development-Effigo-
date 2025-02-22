@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, Routes, Route } from "react-router-dom";
 import api from "../services/api";
+import {logoutUser}  from '../services/util';
+
 import Profile from "./Profile";
 import EditProfile from "./EditProfile";
 import Messages from "./Messages";
-//import Notifications from "./Notifications";
 import ViewDocuments from "./ViewDoucments";
 import PropTypes from "prop-types";
 
@@ -31,21 +32,13 @@ const Dashboard = ({ refreshToken, setRefreshToken }) => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    try {
-      if (!refreshToken) {
-        console.warn(" No refresh token found, skipping logout API call.");
-      } else {
-        await api.post("/logout", { refreshToken }); //  Send refresh token in body
+      try {
+        logoutUser(refreshToken, setRefreshToken);
+        navigate("/login");
+      } catch (error) {
+        console.error(" Logout failed:", error);
       }
-
-      setRefreshToken(null); //  Clear refresh token from memory
-      localStorage.removeItem("user");
-      localStorage.removeItem("refreshToken");
-      navigate("/login");
-    } catch (error) {
-      console.error(" Logout failed:", error);
-    }
-  };
+    };
 
   return (
     <div className="min-h-screen  flex">
@@ -86,8 +79,8 @@ const Dashboard = ({ refreshToken, setRefreshToken }) => {
 
 
 Dashboard.propTypes = {
-    refreshToken: PropTypes.string,  // ✅ refreshToken must be a string
-    setRefreshToken: PropTypes.func.isRequired,  // ✅ setRefreshToken must be a function
+    refreshToken: PropTypes.string,  //  refreshToken must be a string
+    setRefreshToken: PropTypes.func.isRequired,  //  setRefreshToken must be a function
   };
 
 export default Dashboard;

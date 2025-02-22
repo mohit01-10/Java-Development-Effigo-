@@ -85,6 +85,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, Routes, Route } from "react-router-dom";
 import api from "../services/api";
+import { logoutUser } from '../services/util';
 import UserManagement from "./UserManagement";
 import LoginHistory from "./LoginHistory";
 import AddUser from "./AddUser";
@@ -118,15 +119,7 @@ const AdminDashboard = ({ refreshToken, setRefreshToken }) => {
 
   const handleLogout = async () => {
     try {
-      if (!refreshToken) {
-        console.warn(" No refresh token found, skipping logout API call.");
-      } else {
-        await api.post("/logout", { refreshToken }); //  Send refresh token in body
-      }
-
-      setRefreshToken(null); //  Clear refresh token from memory
-      localStorage.removeItem("user");
-      localStorage.removeItem("refreshToken");
+      logoutUser(refreshToken, setRefreshToken);
       navigate("/login");
     } catch (error) {
       console.error(" Logout failed:", error);

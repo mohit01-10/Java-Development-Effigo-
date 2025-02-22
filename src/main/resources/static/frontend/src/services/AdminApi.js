@@ -50,16 +50,6 @@ export const uploadDocument = async (userId, formData) => {
   }
 };
 
-//  Get Login History
-// export const getLoginHistory = async () => {
-//   try {
-//     const response = await api.get("/admin/logging", { withCredentials: true });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching login history:", error.response || error);
-//     throw error;
-//   }
-// };
 
 export const getLoginHistory = async (page = 0, size = 10) => {
     try {
@@ -72,7 +62,7 @@ export const getLoginHistory = async (page = 0, size = 10) => {
   };
 
 
-  
+
 //  Bulk Register Users via Excel
 export const bulkRegisterUsers = async (formData) => {
   try {

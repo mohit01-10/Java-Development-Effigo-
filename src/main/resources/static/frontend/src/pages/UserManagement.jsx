@@ -72,9 +72,19 @@ const UserManagement = () => {
       alert("Please select a file before uploading.");
       return;
     }
+  
+
+    const MAX_FILE_SIZE = 1 * 1024 * 1024; 
+  
+    if (uploadFile.size > MAX_FILE_SIZE) {
+      alert("File size exceeds the 1MB limit. Please upload a smaller file.");
+      return;
+    }
+  
     try {
       const formData = new FormData();
       formData.append("file", uploadFile);
+      
       await uploadDocument(selectedUser.uid, formData);
       alert("Document uploaded successfully!");
       setUploadFile(null);
@@ -82,6 +92,7 @@ const UserManagement = () => {
       alert("Failed to upload document: " + error);
     }
   };
+  
 
   const handleChangeStatus = async () => {
     try {

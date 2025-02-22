@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { logoutUser } from '../services/util';
 
 const EditProfile = () => {
+    const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refreshToken"));
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const navigate = useNavigate();
 
@@ -10,24 +12,38 @@ const EditProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.put("/user/profile", formData, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+        const response = await api.put("/user/profile", formData, {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
 
-      const updatedUser = response.data;
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      
-      alert("Profile updated successfully!");
-      navigate("/dashboard/profile");
+        const updatedUser = response.data;
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        
+        alert("Profile updated successfully!");
+        navigate("/dashboard/profile");
+
     } catch (error) {
-      alert("Error updating profile: " + (error.response?.data?.error || error.message));
+        console.error(" Error updating profile:", error.response?.data || error.message);
+
+        if (error.response?.status === 403) {
+            const errorMessage = error.response?.data?.error || "";
+
+            //  If user is INACTIVE, log them out
+            if (errorMessage.includes("User is INACTIVE")) {
+                alert("Your account has been deactivated. You will be logged out.");
+                logoutUser(refreshToken, setRefreshToken);
+                navigate("/login")
+                return;
+            }
+        }
+
+        alert(" Error updating profile: " + (error.response?.data?.error || error.message));
     }
-  };
-  
+};
 
   return (
     <div className="p-4 rounded shadow">
