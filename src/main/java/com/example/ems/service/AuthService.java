@@ -105,10 +105,10 @@ public class AuthService {
         
         
         if (user == null) {
-            return new AuthResponseDto(null, "User does not exist!");
+            return new AuthResponseDto(null, "User does not exist! Invalid User Email");
         }
         
-        System.out.println(user.getStatus());
+       // System.out.println(user.getStatus());
 
         //Hash the input password with SHA-256 before matching
         String sha256HashedPassword = hashWithSHA256(request.getPassword());
@@ -116,12 +116,12 @@ public class AuthService {
         //Verify password (Compare hashed input with bcrypt stored password)
         if (!passwordEncoder.matches(sha256HashedPassword, user.getPassword())) {
             System.out.println("Password Mismatch! Hashed Input: " + sha256HashedPassword);
-            return new AuthResponseDto(null, "Invalid email or password");
+            return new AuthResponseDto(null, "Invalid password");
         }
 
         
         if (user.getStatus() != UserStatus.ACTIVE) {
-            return new AuthResponseDto(null, "User is not active");
+            return new AuthResponseDto(null, "User is not Active");
         }
 
 

@@ -22,7 +22,7 @@ public class SchedulerService {
     @Scheduled(cron = "0 44 17 * * ?")// Runs at 12:00 AM every day
 //    @Scheduled(fixedRate = 60000)
     public void autoApprovePendingUsers() {
-        System.out.println("🔹 [Scheduler] Checking for pending users at midnight...");
+        System.out.println(" [Scheduler] Checking for pending users...");
 
         List<Users> pendingUsers = userRepository.findByStatus(UserStatus.PENDING);
 

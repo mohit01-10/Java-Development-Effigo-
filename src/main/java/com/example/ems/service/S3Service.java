@@ -54,6 +54,13 @@ public class S3Service {
      * @throws IOException
      */
     public String uploadFile(MultipartFile file) throws IOException {
+    	
+    	 long MAX_FILE_SIZE = 1 * 1024 * 1024; 
+
+    	    if (file.getSize() > MAX_FILE_SIZE) {
+    	        throw new IllegalArgumentException("File size exceeds the maximum limit of 5MB");
+    	    }
+    	
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename(); // Generate Unique Name
         
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()

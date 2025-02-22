@@ -42,43 +42,60 @@ public class BulkUserService {
      * 
      * @param file
      * @return
-     */
-//    public String registerUsersFromExcel(MultipartFile file) {
-//    	
+     */    
+//    public Map<String, Object> registerUsersFromExcel(MultipartFile file) {
+//        Map<String, Object> response = new HashMap<>();
+//        List<String> skippedUsers = new ArrayList<>();
+//        List<String> registeredUsers = new ArrayList<>();
+//
 //        try {
 //            if (!ExcelService.hasExcelFormat(file)) {
-//                return "Invalid file format. Please upload an Excel file.";
+//                response.put("message", "Invalid file format. Please upload an Excel file.");
+//                return response;
 //            }
 //
 //            InputStream is = file.getInputStream();
 //            List<UserExcelDto> userDtos = ExcelService.excelToUsers(is);
 //
 //            for (UserExcelDto dto : userDtos) {
-//                if (userRepository.findByEmail(dto.getEmail()) != null) {
-//                    continue; 
+//                // Skip empty or null emails
+//                if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+//                    continue;
 //                }
-//            
-//            String sha256HashedPassword1 = hashWithSHA256(dto.getPassword());
-//            String sha256HashedPassword2 = hashWithSHA256(sha256HashedPassword1);
-//            String finalEncodedPassword = passwordEncoder.encode(sha256HashedPassword2);
-//                
-//                Role role = roleRepository.findById(dto.getRoleId()).orElseThrow(() -> new RuntimeException("Invalid Role ID"));
+//
+//                if (userRepository.findByEmail(dto.getEmail()) != null) {
+//                    skippedUsers.add(dto.getEmail().trim()); // Collect existing emails
+//                    continue;
+//                }
+//
+//                String sha256HashedPassword1 = hashWithSHA256(dto.getPassword());
+//                String sha256HashedPassword2 = hashWithSHA256(sha256HashedPassword1);
+//                String finalEncodedPassword = passwordEncoder.encode(sha256HashedPassword2);
+//
+//                Role role = roleRepository.findById(dto.getRoleId())
+//                        .orElseThrow(() -> new RuntimeException("Invalid Role ID"));
 //
 //                Users user = Users.builder()
 //                        .name(dto.getName())
-//                        .email(dto.getEmail())
+//                        .email(dto.getEmail().trim()) // Ensure email is trimmed
 //                        .password(finalEncodedPassword)
 //                        .role(role)
 //                        .status(UserStatus.ACTIVE)
 //                        .build();
 //
 //                userRepository.save(user);
+//                registeredUsers.add(dto.getEmail().trim()); // Collect only valid emails
 //            }
 //
-//            return "Users successfully registered from Excel file.";
-//            
+//            response.put("message", "Users processed successfully.");
+//            response.put("registeredUsers", registeredUsers);
+//            response.put("skippedUsers", skippedUsers);
+//
+//            return response;
+//
 //        } catch (Exception e) {
-//            return "Error processing file: " + e.getMessage();
+//            response.put("message", "Error processing file: " + e.getMessage());
+//            return response;
 //        }
 //    }
     
@@ -88,26 +105,34 @@ public class BulkUserService {
         List<String> registeredUsers = new ArrayList<>();
 
         try {
-            if (!ExcelService.hasExcelFormat(file)) {
-                response.put("message", "Invalid file format. Please upload an Excel file.");
+            if (!ExcelService.hasSupportedFormat(file)) {
+                response.put("message", "Invalid file format. Please upload an Excel or CSV file.");
                 return response;
             }
 
             InputStream is = file.getInputStream();
-            List<UserExcelDto> userDtos = ExcelService.excelToUsers(is);
+            List<UserExcelDto> userDtos;
+
+            if (file.getContentType().equals("text/csv") || file.getContentType().equals("application/csv")) {
+                userDtos = ExcelService.csvToUsers(is); 
+            } else {
+                userDtos = ExcelService.excelToUsers(is); 
+            }
 
             for (UserExcelDto dto : userDtos) {
-                // ✅ Skip empty or null emails
-                if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+                if (dto.getName() == null || dto.getName().trim().isEmpty() ||
+                    dto.getEmail() == null || dto.getEmail().trim().isEmpty() ||
+                    dto.getPassword() == null || dto.getPassword().trim().isEmpty() ||
+                    (dto.getRoleId() != 1 && dto.getRoleId() != 2)) { 
                     continue;
                 }
 
-                if (userRepository.findByEmail(dto.getEmail()) != null) {
-                    skippedUsers.add(dto.getEmail().trim()); // Collect only valid emails
+                if (userRepository.findByEmail(dto.getEmail().trim()) != null) {
+                    skippedUsers.add(dto.getEmail().trim());
                     continue;
                 }
 
-                String sha256HashedPassword1 = hashWithSHA256(dto.getPassword());
+                String sha256HashedPassword1 = hashWithSHA256(dto.getPassword().trim());
                 String sha256HashedPassword2 = hashWithSHA256(sha256HashedPassword1);
                 String finalEncodedPassword = passwordEncoder.encode(sha256HashedPassword2);
 
@@ -115,28 +140,28 @@ public class BulkUserService {
                         .orElseThrow(() -> new RuntimeException("Invalid Role ID"));
 
                 Users user = Users.builder()
-                        .name(dto.getName())
-                        .email(dto.getEmail().trim()) // Ensure email is trimmed
+                        .name(dto.getName().trim())
+                        .email(dto.getEmail().trim())
                         .password(finalEncodedPassword)
                         .role(role)
                         .status(UserStatus.ACTIVE)
                         .build();
 
                 userRepository.save(user);
-                registeredUsers.add(dto.getEmail().trim()); // Collect only valid emails
+                registeredUsers.add(dto.getEmail().trim());
             }
 
             response.put("message", "Users processed successfully.");
             response.put("registeredUsers", registeredUsers);
             response.put("skippedUsers", skippedUsers);
 
-            return response;
-
         } catch (Exception e) {
             response.put("message", "Error processing file: " + e.getMessage());
-            return response;
         }
+
+        return response;
     }
+
 
     
     

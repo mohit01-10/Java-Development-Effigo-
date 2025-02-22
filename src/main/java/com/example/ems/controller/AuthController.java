@@ -21,6 +21,7 @@ import com.example.ems.dto.LoginRequestDto;
 import com.example.ems.dto.RegisterRequestDto;
 import com.example.ems.entity.RefreshToken;
 import com.example.ems.entity.Users;
+import com.example.ems.enums.UserStatus;
 import com.example.ems.repository.UserRepository;
 import com.example.ems.service.AuthService;
 import com.example.ems.service.JwtService;
@@ -73,8 +74,13 @@ public class AuthController {
 	      Users user = userRepository.findByEmail(request.getEmail());
 	
 	      if (user == null || authResponse.getToken() == null) {
-	          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username/password or User not Active");
+	          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse.getMessage());
 	      }
+	      
+	      if (user.getStatus() != UserStatus.ACTIVE) {
+	    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse.getMessage());
+	        }
+
 	
 	      // Generate & store refresh token in DB
 	      RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user);
